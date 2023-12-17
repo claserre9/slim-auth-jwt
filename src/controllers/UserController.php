@@ -25,10 +25,8 @@ class UserController extends AbstractController
      * @throws DataValidationException|Exception
      * @throws \Exception
      */
-    public function register(
-        ServerRequestInterface $request,
-        ResponseInterface $response
-    ): ResponseInterface {
+    public function register(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
 
         $userData = $request->getParsedBody();
         $userValidator = UserValidators::validateUserRegistration($userData);
@@ -48,8 +46,7 @@ class UserController extends AbstractController
             ->setEmail($email)
             ->setPassword($hash)
             ->setActivationToken($token)
-            ->setActivationTokenExpiryDate($expiration)
-        ;
+            ->setActivationTokenExpiryDate($expiration);
 
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
@@ -59,7 +56,7 @@ class UserController extends AbstractController
         $subject = "Welcome to App Mailer!";
 
         $message =
-        <<<EOF
+            <<<EOF
         <h3>Please activate your account!</h3>
         <div>Click the following link to activate your account:</div>
         <p>$activationLink</p>
@@ -231,7 +228,7 @@ class UserController extends AbstractController
     <a href="{$_ENV['APP_URL']}/auth/password/confirm/$token">Reset Password</a>
     <p>This link will expire on $expirationDate</p></p>
     EOF
-);
+        );
         return $this->JSONResponse($response, json_encode($user));
     }
 
@@ -244,7 +241,7 @@ class UserController extends AbstractController
 
         $newPassword = $request->getParsedBody()['password'];
         $token = $args['token'];
-        if(!$newPassword){
+        if (!$newPassword) {
             throw new HttpBadRequestException($request, 'Password not provided');
         }
         if ($token === null) {
@@ -286,7 +283,7 @@ class UserController extends AbstractController
         $helper = new JWTHelpers(new JWTTokenEncoder());
 
         // Verify the refresh token
-        $decoded = $helper->decodeToken($cookies['refreshToken'], $_ENV['JWT_SECRET'] );
+        $decoded = $helper->decodeToken($cookies['refreshToken'], $_ENV['JWT_SECRET']);
 
         if (!$decoded) {
             throw new HttpBadRequestException($request, 'Invalid refresh token');
@@ -306,7 +303,8 @@ class UserController extends AbstractController
         return $this->JSONResponse($response, json_encode(['accessToken' => $newAccessToken]));
     }
 
-    public function logout(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface{
+    public function logout(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
         $response = $response
             ->withAddedHeader(
                 'Set-Cookie',

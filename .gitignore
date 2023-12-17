@@ -3,3 +3,4 @@
 /.env
 /var/
 /public/uploads/
+/.phpunit.result.cache

@@ -12,12 +12,4 @@
         </testsuite>
     </testsuites>
 
-    <coverage processUncoveredFiles="true">
-        <include>
-            <directory>src</directory>
-        </include>
-        <report>
-            <html outputDirectory="coverage" lowUpperBound="20" highLowerBound="50"/>
-        </report>
-    </coverage>
 </phpunit>
