@@ -1,13 +1,12 @@
 <?php
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
 
 use App\controllers\UploadController;
 use App\controllers\UserController;
 use App\handlers\HttpErrorHandler;
-use App\middlewares\AuthMiddleware;
+use App\middlewares\AuthenticationMiddleware;
 use DI\ContainerBuilder;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Stream;
 use Slim\Routing\RouteCollectorProxy;
@@ -16,6 +15,12 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..');
 $dotenv->safeLoad();
+
+if($_ENV['APP_DEBUG']) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 try {
     $builder = new ContainerBuilder();
@@ -27,10 +32,22 @@ try {
     //Middlewares
     $app->addBodyParsingMiddleware();
     $app->addRoutingMiddleware();
-    $errorHandler = new HttpErrorHandler($app->getCallableResolver(), $app->getResponseFactory());
+
+    $app->options('/{routes:.+}', function ($request, $response, $args) {
+        return $response;
+    });
+
+    $app->add(function ($request, $handler) {
+        $response = $handler->handle($request);
+        return $response
+            ->withHeader('Access-Control-Allow-Origin', $_ENV['APP_URL_FRONTEND'])
+            ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    });
+
+    $errorHandler = new HttpErrorHandler($app->getCallableResolver(), $app->getResponseFactory(), $app->getContainer()->get(Logger::class));
     $app->addErrorMiddleware(true, true, true)
         ->setDefaultErrorHandler($errorHandler);
-
 
 
     $app->group('/auth', function (RouteCollectorProxy $group) {
@@ -39,18 +56,18 @@ try {
         $group->get('/activate', [UserController::class, 'activate']);
         $group->get('/activation/send', [UserController::class, 'sendActivationToken']);
         $group->post('/password/reset', [UserController::class, 'passwordReset']);
-        $group->post('/password/confirm', [UserController::class, 'passwordResetConfirm']);
+        $group->post('/password/confirm/{token}', [UserController::class, 'passwordResetConfirm']);
         $group->get('/refresh/token', [UserController::class, 'refreshToken']);
-        $group->get('/me', [UserController::class, 'getLoggedInUser'])->add(new AuthMiddleware());
+        $group->get('/me', [UserController::class, 'getLoggedInUser'])->add(new AuthenticationMiddleware());
+        $group->get('/logout', [UserController::class, 'logout']);
     });
 
-    $app->post('/upload/picture', [UploadController::class, 'upload'])->add(new AuthMiddleware());
+    $app->post('/upload/picture', [UploadController::class, 'upload'])->add(new AuthenticationMiddleware());
     //$app->get('/download/csv', [DownloadController::class, 'downloadCSV']);
 
 
     $app->get('/static/{path:.+}', function ($request, $response, $args) {
-        $path = $args['path'];
-        $fullPath = __DIR__ . '/' . $path;
+        $fullPath = __DIR__ . '/' . $args['path'];
 
         // Check if the file exists
         if (file_exists($fullPath) && is_file($fullPath)) {

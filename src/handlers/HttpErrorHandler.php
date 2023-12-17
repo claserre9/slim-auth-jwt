@@ -50,6 +50,15 @@ class HttpErrorHandler extends ErrorHandler
                 'message' => $description,
             ],
         ];
+        if($_ENV['APP_DEBUG'] && $this->displayErrorDetails) {
+            $error['error']['type'] = get_class($exception);
+            $error['error']['description'] = $exception->getMessage();
+            $error['error']['file'] = $exception->getFile();
+        }
+
+        if($_ENV['APP_DEBUG'] && $this->logErrors) {
+            $this->logger->error($exception->getMessage());
+        }
 
         $payload = json_encode($error, JSON_PRETTY_PRINT);
 

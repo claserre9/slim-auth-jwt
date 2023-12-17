@@ -220,7 +220,7 @@ class UserController extends AbstractController
         $expiration = time() + 24 * 3600;
         $expirationDate = date('Y-m-d H:i:s', $expiration);
         $user->setPasswordResetToken($token);
-        $user->setActivationTokenExpiryDate($expiration);
+        $user->setPasswordResetTokenExpiryDate($expiration);
         $this->getEntityManager()->flush();
 
         $mailService = $this->getMailService();
@@ -228,7 +228,7 @@ class UserController extends AbstractController
             'Password Reset',
             <<<EOF
     <div>Click the link below to reset your password</div>
-    <a href="{$_ENV['APP_URL']}/auth/password/reset?token=$token">Reset Password</a>
+    <a href="{$_ENV['APP_URL']}/auth/password/confirm/$token">Reset Password</a>
     <p>This link will expire on $expirationDate</p></p>
     EOF
 );
@@ -239,10 +239,11 @@ class UserController extends AbstractController
     /**
      * @throws Exception
      */
-    public function passwordResetConfirm(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function passwordResetConfirm(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
-        $token = $request->getQueryParams()['token'];
+
         $newPassword = $request->getParsedBody()['password'];
+        $token = $args['token'];
         if(!$newPassword){
             throw new HttpBadRequestException($request, 'Password not provided');
         }
@@ -259,7 +260,7 @@ class UserController extends AbstractController
 
         $hash = PasswordService::hashPassword($newPassword);
         $user->setPasswordResetToken(null);
-        $user->setActivationTokenExpiryDate(null);
+        $user->setPasswordResetTokenExpiryDate(null);
         $user->setPassword($hash);
         $this->getEntityManager()->flush();
 
@@ -307,11 +308,11 @@ class UserController extends AbstractController
 
     public function logout(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface{
         $response = $response
-            ->withHeader(
+            ->withAddedHeader(
                 'Set-Cookie',
                 "accessToken=expired; HttpOnly=true; Expires=" . gmdate('D, d M Y H:i:s T', strtotime('-1 year')) . "; Path=/"
             )
-            ->withHeader(
+            ->withAddedHeader(
                 'Set-Cookie',
                 "refreshToken=expired; HttpOnly=true; Expires=" . gmdate('D, d M Y H:i:s T', strtotime('-1 year')) . "; Path=/"
             );

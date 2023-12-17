@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpUnauthorizedException;
 
-class AuthMiddleware
+class AuthenticationMiddleware
 {
     /**
      * Execute the PHP function.

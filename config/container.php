@@ -3,7 +3,10 @@
 use App\EntityManagerFactory;
 use App\utils\mailers\MailService;
 use Doctrine\ORM\EntityManagerInterface;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use PHPMailer\PHPMailer\PHPMailer;
+use Psr\Log\LoggerInterface;
 
 /**
  * Variable Definitions
@@ -12,8 +15,19 @@ use PHPMailer\PHPMailer\PHPMailer;
  *
  */
 $definitions = [
-    EntityManagerInterface::class=> DI\factory([EntityManagerFactory::class, 'create']),
+    EntityManagerInterface::class => DI\factory([EntityManagerFactory::class, 'create']),
     PHPMailer::class => DI\create()->constructor(),
+
+    StreamHandler::class => DI\create()->constructor(
+        "var/log/app.log",
+        Logger::ERROR
+    ),
+
+    Logger::class => DI\create()
+        ->constructor(
+            'app.log',
+            [DI\get(StreamHandler::class)]
+        ),
 
     MailService::class => DI\create()
         ->constructor(DI\get(PHPMailer::class))
@@ -24,7 +38,6 @@ $definitions = [
         ->method("setSender", $_ENV["SMTP_GOOGLE_USERNAME"])
         ->method("setSenderName", $_ENV["SMTP_GOOGLE_NAME"]),
 ];
-
 
 
 return $definitions;
