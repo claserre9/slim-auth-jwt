@@ -2,15 +2,17 @@
 
 namespace App\entities;
 
-use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="user")
+ * @ORM\HasLifecycleCallbacks()
  */
-class User
+class User implements \JsonSerializable
 {
+    use Timestamp;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -24,7 +26,7 @@ class User
     private string $name;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true)
      */
     private string $email;
 
@@ -36,27 +38,40 @@ class User
     /**
      * @ORM\Column(type="json")
      */
-    private array $role;
+    private array $role = ['ROLE_USER'];
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private ?DateTime $createdAt;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private ?DateTime $updatedAt;
 
     /**
      * @ORM\Column(type="boolean", options={"default": 0})
      */
-    private bool $isActive;
+    private bool $isActive = false;
 
-    public function __construct()
-    {
-        $this->isActive = false;
-    }
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private ?string $activationToken = null;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private ?int $activationTokenExpiryDate = null;
+
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private ?string $passwordResetToken = null;
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private ?int $passwordResetTokenExpiryDate = null;
+
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private string $profilePicture;
+
 
     /**
      * @return int
@@ -144,45 +159,11 @@ class User
      */
     public function setRole(array $role): User
     {
+        $role = array_unique([...$this->role, ...$role]);
         $this->role = $role;
         return $this;
     }
 
-    /**
-     * @return DateTime|null
-     */
-    public function getCreatedAt(): ?DateTime
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param DateTime|null $createdAt
-     * @return User
-     */
-    public function setCreatedAt(?DateTime $createdAt): User
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return DateTime|null
-     */
-    public function getUpdatedAt(): ?DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param DateTime|null $updatedAt
-     * @return User
-     */
-    public function setUpdatedAt(?DateTime $updatedAt): User
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
 
     /**
      * @return bool
@@ -202,9 +183,79 @@ class User
         return $this;
     }
 
+    public function getProfilePicture(): string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(string $profilePicture): User
+    {
+        $this->profilePicture = $profilePicture;
+        return $this;
+    }
 
 
+    public function getActivationToken(): ?string
+    {
+        return $this->activationToken;
+    }
 
 
+    public function setActivationToken(?string $activationToken): User
+    {
+        $this->activationToken = $activationToken;
+        return $this;
+    }
 
+
+    public function getActivationTokenExpiryDate(): ?int
+    {
+        return $this->activationTokenExpiryDate;
+    }
+
+    public function setActivationTokenExpiryDate(?int $activationTokenExpiryDate): User
+    {
+        $this->activationTokenExpiryDate = $activationTokenExpiryDate;
+        return $this;
+    }
+
+
+    public function getPasswordResetToken(): ?string
+    {
+        return $this->passwordResetToken;
+    }
+
+
+    public function setPasswordResetToken(?string $passwordResetToken): User
+    {
+        $this->passwordResetToken = $passwordResetToken;
+        return $this;
+    }
+
+
+    public function getPasswordResetTokenExpiryDate(): ?int
+    {
+        return $this->passwordResetTokenExpiryDate;
+    }
+
+
+    public function setPasswordResetTokenExpiryDate(?int $passwordResetTokenExpiryDate): User
+    {
+        $this->passwordResetTokenExpiryDate = $passwordResetTokenExpiryDate;
+        return $this;
+    }
+
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'role' => $this->role,
+            'isActive' => $this->isActive,
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
+        ];
+    }
 }

@@ -1,54 +1,53 @@
 <?php
 
-namespace App\ErrorHandler;
+namespace App\handlers;
 
+use App\exceptions\DataValidationException;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Exception\HttpBadRequestException;
-use Slim\Exception\HttpException;
-use Slim\Exception\HttpForbiddenException;
-use Slim\Exception\HttpMethodNotAllowedException;
-use Slim\Exception\HttpNotFoundException;
-use Slim\Exception\HttpNotImplementedException;
-use Slim\Exception\HttpUnauthorizedException;
 use Slim\Handlers\ErrorHandler;
 use Throwable;
 
+/**
+ * Class HttpErrorHandler
+ *
+ * This class extends the ErrorHandler class and handles HTTP error exceptions by returning a JSON response
+ * with the appropriate status code, error type, and error message.
+ */
 class HttpErrorHandler extends ErrorHandler
 {
     const ERROR_TYPES = [
-        HttpNotFoundException::class => ['RESOURCE_NOT_FOUND', 404],
-        HttpMethodNotAllowedException::class => ['NOT_ALLOWED', 405],
-        HttpUnauthorizedException::class => ['UNAUTHENTICATED', 401],
-        HttpForbiddenException::class => ['INSUFFICIENT_PRIVILEGES', 403],
-        HttpBadRequestException::class => ['BAD_REQUEST', 400],
-        HttpNotImplementedException::class => ['NOT_IMPLEMENTED', 501],
+        'Slim\Exception\HttpNotFoundException' => ['RESOURCE_NOT_FOUND', 404],
+        'Slim\Exception\HttpMethodNotAllowedException' => ['NOT_ALLOWED', 405],
+        'Slim\Exception\HttpUnauthorizedException' => ['UNAUTHENTICATED', 401],
+        'Slim\Exception\HttpForbiddenException' => ['INSUFFICIENT_PRIVILEGES', 403],
+        'Slim\Exception\HttpBadRequestException' => ['BAD_REQUEST', 400],
+        'Slim\Exception\HttpNotImplementedException' => ['NOT_IMPLEMENTED', 501],
+        'App\exceptions\DataValidationException' => ['DATA_VALIDATION_FAILED', 400],
     ];
 
     protected function respond(): ResponseInterface
     {
-        $exception = $this->exception;
+        $exception = $this->exception ?? null;
         $statusCode = 500;
         $type = 'SERVER_ERROR';
         $description = 'An internal error has occurred while processing your request.';
 
-        if ($exception instanceof HttpException) {
-            $statusCode = $exception->getCode();
-            $description = $exception->getMessage();
-
+        if ($exception instanceof Throwable) {
             if (array_key_exists(get_class($exception), self::ERROR_TYPES)) {
                 [$type, $statusCode] = self::ERROR_TYPES[get_class($exception)];
+                if ($exception instanceof DataValidationException) {
+                    $description = json_decode($exception->getMessage(), true);
+                } else {
+                    $description = $exception->getMessage();
+                }
             }
-        }
-
-        if (!$exception instanceof HttpException) {
-            $description = $exception->getMessage();
         }
 
         $error = [
             'error' => [
                 'statusCode' => $statusCode,
                 'type' => $type,
-                'message' => json_decode($description),
+                'message' => $description,
             ],
         ];
 

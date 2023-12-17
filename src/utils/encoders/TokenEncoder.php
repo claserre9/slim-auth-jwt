@@ -1,6 +1,6 @@
 <?php
 
-namespace App\utils;
+namespace App\utils\encoders;
 
 interface TokenEncoder
 {

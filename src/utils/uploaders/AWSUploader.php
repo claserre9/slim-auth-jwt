@@ -1,10 +1,15 @@
 <?php
 
-namespace App\utils;
+namespace App\utils\uploaders;
 
 use Aws\S3\S3Client;
 use Slim\Psr7\UploadedFile;
 
+/**
+ * Class AWSUploader
+ *
+ * This class implements the Uploader interface and provides functions to upload files to AWS S3.
+ */
 class AWSUploader implements Uploader
 {
     private S3Client $s3Client;

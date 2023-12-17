@@ -1,8 +1,7 @@
 <?php
 
-namespace App\utils;
+namespace App\utils\encoders;
 
-use App\utils\TokenEncoder;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
