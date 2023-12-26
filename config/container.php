@@ -19,7 +19,7 @@ $definitions = [
     PHPMailer::class => DI\create()->constructor(),
 
     StreamHandler::class => DI\create()->constructor(
-        "var/log/app.log",
+        __DIR__."/../var/log/app.log",
         Logger::ERROR
     ),
 

@@ -19,7 +19,7 @@ class UploadController extends AbstractController
     public function upload(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $location = "uploads";
-        $serverRoot = $request->getServerParams()["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "public/{$location}";
+        $serverRoot = $request->getServerParams()["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "public/$location";
         $file = $request->getUploadedFiles()['file'];
         $uploaderHelpers = new UploaderHelpers(new LocalUploader());
 
@@ -30,7 +30,7 @@ class UploadController extends AbstractController
         if (!$user) {
             throw new HttpUnauthorizedException($request, 'Not authorized');
         }
-        $user->setProfilePic($url);
+        $user->setProfilePicture($url);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
         return $this->JSONResponse($response, json_encode(["url" => $url]));

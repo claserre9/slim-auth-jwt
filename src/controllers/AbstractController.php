@@ -50,7 +50,7 @@ abstract class AbstractController
      * Generates a JSON response with the provided payload and status code.
      *
      * @param ResponseInterface $response The response object.
-     * @param false|string $payload The JSON payload to be written to the response body.
+     * @param string $payload The JSON payload to be written to the response body.
      * @param int $status The HTTP status code (default: 200).
      * @return ResponseInterface modified response object.
      */

@@ -31,7 +31,7 @@ class EntityManagerFactory
             true
         );
         $connection = DriverManager::getConnection([
-            'url' => 'mysql://root:valnet2021@localhost:3306/test',
+            'url' => 'mysql://root:@localhost:3306/slim-jwt-db',
             'driver' => 'pdo_mysql',
         ], $config);
         return new EntityManager($connection, $config);

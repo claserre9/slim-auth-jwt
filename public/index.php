@@ -6,7 +6,8 @@ use App\handlers\HttpErrorHandler;
 use App\middlewares\AuthenticationMiddleware;
 use DI\ContainerBuilder;
 use Monolog\Logger;
-use Psr\Log\LoggerInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Stream;
 use Slim\Routing\RouteCollectorProxy;
@@ -16,11 +17,6 @@ require __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..');
 $dotenv->safeLoad();
 
-if($_ENV['APP_DEBUG']) {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-}
 
 try {
     $builder = new ContainerBuilder();
@@ -33,7 +29,7 @@ try {
     $app->addBodyParsingMiddleware();
     $app->addRoutingMiddleware();
 
-    $app->options('/{routes:.+}', function ($request, $response, $args) {
+    $app->options('/{routes:.+}', function ($response) {
         return $response;
     });
 
@@ -85,4 +81,5 @@ try {
 
 } catch (Exception $e) {
     exit($e->getMessage().PHP_EOL);
+} catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 }

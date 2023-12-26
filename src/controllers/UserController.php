@@ -234,6 +234,10 @@ class UserController extends AbstractController
 
 
     /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param array $args
+     * @return ResponseInterface
      * @throws Exception
      */
     public function passwordResetConfirm(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
@@ -303,7 +307,7 @@ class UserController extends AbstractController
         return $this->JSONResponse($response, json_encode(['accessToken' => $newAccessToken]));
     }
 
-    public function logout(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function logout(ResponseInterface $response): ResponseInterface
     {
         $response = $response
             ->withAddedHeader(

@@ -8,7 +8,7 @@ use SplFileObject;
 
 class DownloadController extends AbstractController
 {
-    public function downloadCSV(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function downloadCSV(ResponseInterface $response): ResponseInterface
     {
         $data = [
             ['Column 1', 'Column 2', 'Column 3'],

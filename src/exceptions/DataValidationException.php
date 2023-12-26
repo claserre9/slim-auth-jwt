@@ -13,13 +13,11 @@ class DataValidationException extends Exception
 {
     private array $errors;
 
-    public function __construct(array $errors)
+    public function __construct(array $errors, $code = 400, Exception $previous = null)
     {
         $this->errors = $errors;
-        $message = json_encode($errors);
-        $code = 400;
-        $previous = null;
-        parent::__construct($message, $code, $previous);
+        $this->code = $code;
+        parent::__construct(json_encode($errors), $code, $previous);
     }
 
     public function getErrors(): array
