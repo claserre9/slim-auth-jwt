@@ -4,6 +4,7 @@ use App\controllers\UploadController;
 use App\controllers\UserController;
 use App\handlers\HttpErrorHandler;
 use App\middlewares\AuthenticationMiddleware;
+use App\middlewares\CorsMiddleware;
 use DI\ContainerBuilder;
 use Monolog\Logger;
 use Psr\Container\ContainerExceptionInterface;
@@ -33,18 +34,14 @@ try {
         return $response;
     });
 
-    $app->add(function ($request, $handler) {
-        $response = $handler->handle($request);
-        return $response
-            ->withHeader('Access-Control-Allow-Origin', $_ENV['APP_URL_FRONTEND'])
-            ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    });
+    $app->add(new CorsMiddleware());
 
     $errorHandler = new HttpErrorHandler(
 		$app->getCallableResolver(),
 	    $app->getResponseFactory(), $app->getContainer()->get(Logger::class));
-    $app->addErrorMiddleware(true, true, true)
+
+
+	$app->addErrorMiddleware(true, true, true)
         ->setDefaultErrorHandler($errorHandler);
 
 
