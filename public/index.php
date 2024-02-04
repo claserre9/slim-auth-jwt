@@ -41,7 +41,9 @@ try {
             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     });
 
-    $errorHandler = new HttpErrorHandler($app->getCallableResolver(), $app->getResponseFactory(), $app->getContainer()->get(Logger::class));
+    $errorHandler = new HttpErrorHandler(
+		$app->getCallableResolver(),
+	    $app->getResponseFactory(), $app->getContainer()->get(Logger::class));
     $app->addErrorMiddleware(true, true, true)
         ->setDefaultErrorHandler($errorHandler);
 
