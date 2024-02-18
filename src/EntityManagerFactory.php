@@ -16,21 +16,22 @@ use Doctrine\ORM\ORMSetup;
 class EntityManagerFactory
 {
 
-    /**
-     * Creates a new instance of the EntityManager.
-     *
-     * @return EntityManager The created EntityManager instance.
-     *
-     * @throws Exception
-     * @throws MissingMappingDriverImplementation
-     */
+	/**
+	 * Creates a new instance of the EntityManager.
+	 *
+	 * @return EntityManager The created EntityManager instance.
+	 *
+	 * @throws Exception
+	 * @throws MissingMappingDriverImplementation
+	 */
     public static function create(): EntityManager
     {
         $config = ORMSetup::createAnnotationMetadataConfiguration(
             array(__DIR__.'/../src', __DIR__.'/../tests'),
             true
         );
-        $connection = DriverManager::getConnection([
+
+	    $connection = DriverManager::getConnection([
             'url' => 'mysql://root:@localhost:3306/slim-jwt-db',
             'driver' => 'pdo_mysql',
         ], $config);
