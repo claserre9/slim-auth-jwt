@@ -8,6 +8,7 @@ use App\helpers\JWTHelpers;
 use App\utils\encoders\JWTTokenEncoder;
 use App\utils\PasswordService;
 use App\validators\UserValidators;
+use DateTime;
 use PHPMailer\PHPMailer\Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -46,10 +47,14 @@ class UserController extends AbstractController
             ->setEmail($email)
             ->setPassword($hash)
             ->setActivationToken($token)
-            ->setActivationTokenExpiryDate($expiration);
+            ->setActivationTokenExpiryDate($expiration)
+	        ->setCreatedAt(new DateTime())
+	        ->setUpdatedAt(new DateTime())
+        ;
 
-        $this->getEntityManager()->persist($user);
-        $this->getEntityManager()->flush();
+	    $entityManager = $this->getEntityManager();
+	    $entityManager->persist($user);
+        $entityManager->flush();
 
         $activationLink = "{$_ENV['APP_URL']}/auth/activate?token=$token";
         $expirationDate = date('Y-m-d H:i:s', $expiration);

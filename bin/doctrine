@@ -18,5 +18,5 @@ try {
         new SingleManagerProvider($entityManager)
     );
 } catch (\Doctrine\DBAL\Exception|MissingMappingDriverImplementation $e) {
-
+ exit($e->getMessage().PHP_EOL);
 }

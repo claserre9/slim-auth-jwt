@@ -2,75 +2,54 @@
 
 namespace App\entities;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="user")
- * @ORM\HasLifecycleCallbacks()
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'users')]
 class User implements \JsonSerializable
 {
-    use Timestamp;
-
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Column(type="integer")
-     */
+	#[ORM\Id]
+	#[ORM\Column(type: 'integer')]
+	#[ORM\GeneratedValue]
     private int $id;
-
-    /**
-     * @ORM\Column(type="string")
-     */
+	#[ORM\Column(type: 'string')]
     private string $name;
 
-    /**
-     * @ORM\Column(type="string", unique=true)
-     */
+	#[ORM\Column(type: 'string', unique: true)]
     private string $email;
 
-    /**
-     * @ORM\Column(type="string")
-     */
+	#[ORM\Column(type: 'string')]
     private string $password;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+	#[ORM\Column(type: 'json')]
     private array $role = ['ROLE_USER'];
 
-
-    /**
-     * @ORM\Column(type="boolean", options={"default": 0})
-     */
+	#[ORM\Column(type: 'boolean')]
     private bool $isActive = false;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+	#[ORM\Column(type: 'string', nullable: true)]
     private ?string $activationToken = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+	#[ORM\Column(type: 'string', nullable: true)]
     private ?int $activationTokenExpiryDate = null;
 
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+	#[ORM\Column(type: 'string', nullable: true)]
     private ?string $passwordResetToken = null;
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+
+	#[ORM\Column(type: 'string', nullable: true)]
     private ?int $passwordResetTokenExpiryDate = null;
 
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+	#[ORM\Column(type: 'string', nullable: true)]
     private string $profilePicture;
+
+
+	#[ORM\Column(type: 'datetime', nullable: true)]
+	private ?DateTime $createdAt = null;
+
+	#[ORM\Column(type: 'datetime', nullable: true)]
+	private ?DateTime $updatedAt = null;
 
 
     /**
@@ -183,7 +162,41 @@ class User implements \JsonSerializable
         return $this;
     }
 
-    public function getProfilePicture(): string
+	/**
+	 * @return DateTime|null
+	 */
+	public function getCreatedAt(): ?DateTime
+	{
+		return $this->createdAt;
+	}
+
+	/**
+	 * @param DateTime|null $createdAt
+	 */
+	public function setCreatedAt(?DateTime $createdAt): User
+	{
+		$this->createdAt = $createdAt;
+		return $this;
+	}
+
+	/**
+	 * @return DateTime|null
+	 */
+	public function getUpdatedAt(): ?DateTime
+	{
+		return $this->updatedAt;
+	}
+
+	/**
+	 * @param DateTime|null $updatedAt
+	 */
+	public function setUpdatedAt(?DateTime $updatedAt): User
+	{
+		$this->updatedAt = $updatedAt;
+		return $this;
+	}
+
+	public function getProfilePicture(): string
     {
         return $this->profilePicture;
     }
@@ -193,7 +206,6 @@ class User implements \JsonSerializable
         $this->profilePicture = $profilePicture;
         return $this;
     }
-
 
     public function getActivationToken(): ?string
     {
@@ -249,7 +261,7 @@ class User implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id ?? null,
+            'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,

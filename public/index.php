@@ -27,14 +27,9 @@ try {
     $app = AppFactory::createFromContainer($container);
 
     //Middlewares
+	$app->add(new CorsMiddleware());
     $app->addBodyParsingMiddleware();
     $app->addRoutingMiddleware();
-
-    $app->options('/{routes:.+}', function ($response) {
-        return $response;
-    });
-
-    $app->add(new CorsMiddleware());
 
     $errorHandler = new HttpErrorHandler(
 		$app->getCallableResolver(),
