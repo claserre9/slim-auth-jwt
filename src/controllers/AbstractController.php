@@ -6,6 +6,7 @@ use App\utils\mailers\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Twig\Environment;
 
 /**
  * The AbstractController class is an abstract class that provides common functionality
@@ -15,8 +16,8 @@ abstract class AbstractController
 {
     private ?ContainerInterface $container;
     private ?EntityManagerInterface $entityManager;
-
     private ?MailService $mailService;
+	private ?Environment $twig;
 
 
     public function getContainer(): ?ContainerInterface
@@ -35,15 +36,22 @@ abstract class AbstractController
         return $this->mailService;
     }
 
+	public function getTwig(): ?Environment
+	{
+		return $this->twig;
+	}
+
 
     public function __construct(
         ?ContainerInterface     $container,
         ?EntityManagerInterface $entityManager,
-        ?MailService $mailService
+        ?MailService $mailService,
+	    ?Environment $twig
     ) {
         $this->container = $container;
         $this->entityManager = $entityManager;
         $this->mailService = $mailService;
+        $this->twig = $twig;
     }
 
     /**

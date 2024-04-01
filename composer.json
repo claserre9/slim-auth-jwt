@@ -17,7 +17,8 @@
     "ext-fileinfo": "*",
     "vlucas/phpdotenv": "^5.6",
     "phpmailer/phpmailer": "^6.9",
-    "monolog/monolog": "^2.9"
+    "monolog/monolog": "^2.9",
+    "twig/twig": "^3.0"
   },
   "require-dev": {
     "phpstan/phpstan": "^1.10",
