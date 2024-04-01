@@ -9,6 +9,7 @@ use Doctrine\DBAL\Tools\DsnParser;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Exception\MissingMappingDriverImplementation;
 use Doctrine\ORM\ORMSetup;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
  * Class EntityManagerFactory
@@ -30,12 +31,9 @@ class EntityManagerFactory
     {
         $config = ORMSetup::createAttributeMetadataConfiguration(
             array(__DIR__.'/../src', __DIR__.'/../tests'),
-            true
+            true,
         );
 
-//	    $config->setProxyDir(__DIR__ . '/../cache/proxies');
-//	    $config->setProxyNamespace('Proxies');
-//	    $config->setAutoGenerateProxyClasses(true);
 
 
 	    $dsnParser = new DsnParser();

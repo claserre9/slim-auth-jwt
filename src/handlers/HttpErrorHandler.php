@@ -15,7 +15,7 @@ use Throwable;
  */
 class HttpErrorHandler extends ErrorHandler
 {
-    const ERROR_TYPES = [
+    const array ERROR_TYPES = [
         'Slim\Exception\HttpNotFoundException' => ['RESOURCE_NOT_FOUND', 404],
         'Slim\Exception\HttpMethodNotAllowedException' => ['NOT_ALLOWED', 405],
         'Slim\Exception\HttpUnauthorizedException' => ['UNAUTHENTICATED', 401],
